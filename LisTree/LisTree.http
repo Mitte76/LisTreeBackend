@@ -1,0 +1,6 @@
+@LisTree_HostAddress = http://localhost:5226
+
+GET {{LisTree_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
