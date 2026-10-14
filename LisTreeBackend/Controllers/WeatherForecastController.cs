@@ -1,6 +1,7 @@
+using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
 
-namespace LisTree.Controllers
+namespace LisTreeBackend.Controllers
 {
     [ApiController]
     [Route("[controller]")]

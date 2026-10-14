@@ -1,4 +1,4 @@
-namespace LisTree
+namespace Domain.Models
 {
     public class WeatherForecast
     {

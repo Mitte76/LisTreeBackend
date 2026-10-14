@@ -1,5 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
-namespace LisTree.Models;
+namespace Domain.Models;
 
 public class User
 {

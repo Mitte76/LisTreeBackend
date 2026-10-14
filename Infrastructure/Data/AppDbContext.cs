@@ -1,7 +1,7 @@
-﻿using LisTree.Models;
+using Domain.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace LisTree.Data;
+namespace Infrastructure.Data;
 
 public class AppDbContext : DbContext
 {
@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
         : base(options)
     {
     }
+
     public DbSet<User> Users => Set<User>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

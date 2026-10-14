@@ -1,7 +1,7 @@
-using LisTree.Data;
+using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace LisTree
+namespace LisTreeBackend
 {
     public class Program
     {
@@ -11,6 +11,8 @@ namespace LisTree
             builder.Services.AddDbContext<AppDbContext>(options =>
                 options.UseNpgsql(
                     builder.Configuration.GetConnectionString("DefaultConnection")));
+            // Register repository implementations from Infrastructure
+            builder.Services.AddScoped<Application.Interfaces.IUserRepository, Infrastructure.Repositories.UserRepository>();
             // Add services to the container.
 
             builder.Services.AddControllers();
@@ -29,9 +31,7 @@ namespace LisTree
 
             app.UseAuthorization();
 
-
             app.MapControllers();
-
 
             using (var scope = app.Services.CreateScope())
             {

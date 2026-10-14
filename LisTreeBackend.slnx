@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Application/Application.csproj" Id="439a1d9b-bdb1-42fe-87b5-d5cae865ada8" />
+  <Project Path="Domain/Domain.csproj" Id="f256fdad-a26b-4f5d-aabd-17627ac41d28" />
+  <Project Path="Infrastructure/Infrastructure.csproj" Id="8c08af65-5ea5-4215-8c5d-b947115e1364" />
+  <Project Path="LisTreeBackend/API.csproj" />
+</Solution>

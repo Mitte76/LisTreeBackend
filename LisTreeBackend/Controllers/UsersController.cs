@@ -1,29 +1,34 @@
-﻿using LisTree.Data;
-using LisTree.Models;
+﻿using Application.Interfaces;
+using Domain.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-namespace LisTree.Controllers;
+
+namespace LisTreeBackend.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class UsersController(AppDbContext context) : ControllerBase
+public class UsersController : ControllerBase
 {
+    private readonly IUserRepository _userRepository;
+
+    public UsersController(IUserRepository userRepository)
+    {
+        _userRepository = userRepository;
+    }
+
     [HttpGet]
     public async Task<IActionResult> GetUsers()
     {
-        var users = await context.Users.ToListAsync();
+        var users = await _userRepository.GetAllAsync();
         return Ok(users);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUser(int id)
     {
-        var user = await context.Users.FindAsync(id);
+        var user = await _userRepository.GetByIdAsync(id);
 
         if (user == null)
-        {
             return NotFound();
-        }
 
         return Ok(user);
     }
@@ -31,21 +36,21 @@ public class UsersController(AppDbContext context) : ControllerBase
     [HttpPut("{id}")]
     public async Task<IActionResult> UpdateUser(int id, User updatedUser)
     {
-        var user = await context.Users.FindAsync(id);
+        var user = await _userRepository.GetByIdAsync(id);
 
         if (user == null)
-        {
             return NotFound();
-        }
 
         user.Username = updatedUser.Username;
         user.Email = updatedUser.Email;
 
+        _userRepository.Update(user);
+
         try
         {
-            await context.SaveChangesAsync();
+            await _userRepository.SaveChangesAsync();
         }
-        catch (DbUpdateException)
+        catch (Exception)
         {
             return Conflict("Användarnamnet finns redan.");
         }
@@ -56,15 +61,13 @@ public class UsersController(AppDbContext context) : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(int id)
     {
-        var user = await context.Users.FindAsync(id);
+        var user = await _userRepository.GetByIdAsync(id);
 
         if (user == null)
-        {
             return NotFound();
-        }
 
-        context.Users.Remove(user);
-        await context.SaveChangesAsync();
+        _userRepository.Remove(user);
+        await _userRepository.SaveChangesAsync();
 
         return NoContent();
     }
@@ -72,18 +75,17 @@ public class UsersController(AppDbContext context) : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateUser(User user)
     {
-        context.Users.Add(user);
+        await _userRepository.AddAsync(user);
 
         try
         {
-            await context.SaveChangesAsync();
+            await _userRepository.SaveChangesAsync();
         }
-        catch (DbUpdateException)
+        catch (Exception)
         {
             return Conflict("Användarnamnet finns redan.");
         }
 
-        return CreatedAtAction(nameof(GetUsers), user);
+        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
     }
-
 }
