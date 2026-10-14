@@ -2,6 +2,8 @@ using Application.Interfaces;
 using Domain.Models;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
+using Application.Exceptions;
 
 namespace Infrastructure.Repositories;
 
@@ -41,6 +43,19 @@ public class UserRepository : IUserRepository
 
     public async Task SaveChangesAsync()
     {
-        await _context.SaveChangesAsync();
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex)
+        {
+            // Translate Postgres unique constraint violation to application-level exception
+            if (ex.InnerException is PostgresException pgEx && pgEx.SqlState == "23505")
+            {
+                throw new DuplicateUsernameException("Användarnamnet finns redan.", ex);
+            }
+
+            throw;
+        }
     }
 }

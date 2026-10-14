@@ -1,5 +1,5 @@
-﻿using Application.Interfaces;
-using Domain.Models;
+﻿using Application.DTOs;
+using Application.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LisTreeBackend.Controllers;
@@ -8,24 +8,24 @@ namespace LisTreeBackend.Controllers;
 [Route("api/[controller]")]
 public class UsersController : ControllerBase
 {
-    private readonly IUserRepository _userRepository;
+    private readonly IUserService _userService;
 
-    public UsersController(IUserRepository userRepository)
+    public UsersController(IUserService userService)
     {
-        _userRepository = userRepository;
+        _userService = userService;
     }
 
     [HttpGet]
     public async Task<IActionResult> GetUsers()
     {
-        var users = await _userRepository.GetAllAsync();
+        var users = await _userService.GetAllAsync();
         return Ok(users);
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetUser(int id)
     {
-        var user = await _userRepository.GetByIdAsync(id);
+        var user = await _userService.GetByIdAsync(id);
 
         if (user == null)
             return NotFound();
@@ -34,23 +34,17 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> UpdateUser(int id, User updatedUser)
+    public async Task<IActionResult> UpdateUser(int id, UpdateUserDto dto)
     {
-        var user = await _userRepository.GetByIdAsync(id);
-
-        if (user == null)
-            return NotFound();
-
-        user.Username = updatedUser.Username;
-        user.Email = updatedUser.Email;
-
-        _userRepository.Update(user);
-
         try
         {
-            await _userRepository.SaveChangesAsync();
+            await _userService.UpdateAsync(id, dto);
         }
-        catch (Exception)
+        catch (KeyNotFoundException)
+        {
+            return NotFound();
+        }
+        catch (Application.Exceptions.DuplicateUsernameException)
         {
             return Conflict("Användarnamnet finns redan.");
         }
@@ -61,31 +55,29 @@ public class UsersController : ControllerBase
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUser(int id)
     {
-        var user = await _userRepository.GetByIdAsync(id);
-
-        if (user == null)
+        try
+        {
+            await _userService.DeleteAsync(id);
+        }
+        catch (KeyNotFoundException)
+        {
             return NotFound();
-
-        _userRepository.Remove(user);
-        await _userRepository.SaveChangesAsync();
+        }
 
         return NoContent();
     }
 
     [HttpPost]
-    public async Task<IActionResult> CreateUser(User user)
+    public async Task<IActionResult> CreateUser(CreateUserDto dto)
     {
-        await _userRepository.AddAsync(user);
-
         try
         {
-            await _userRepository.SaveChangesAsync();
+            var created = await _userService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetUser), new { id = created.Id }, created);
         }
-        catch (Exception)
+        catch (Application.Exceptions.DuplicateUsernameException)
         {
             return Conflict("Användarnamnet finns redan.");
         }
-
-        return CreatedAtAction(nameof(GetUser), new { id = user.Id }, user);
     }
 }

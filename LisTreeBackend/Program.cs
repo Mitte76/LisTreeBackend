@@ -1,4 +1,5 @@
 using Infrastructure.Data;
+using Infrastructure.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace LisTreeBackend
@@ -8,11 +9,8 @@ namespace LisTreeBackend
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
-            builder.Services.AddDbContext<AppDbContext>(options =>
-                options.UseNpgsql(
-                    builder.Configuration.GetConnectionString("DefaultConnection")));
-            // Register repository implementations from Infrastructure
-            builder.Services.AddScoped<Application.Interfaces.IUserRepository, Infrastructure.Repositories.UserRepository>();
+            // Register infrastructure and application services
+            builder.Services.AddInfrastructure(builder.Configuration);
             // Add services to the container.
 
             builder.Services.AddControllers();
