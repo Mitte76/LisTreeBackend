@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "LisTreeBackend\\API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "LisTreeWeb\\LisTreeWeb.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]
