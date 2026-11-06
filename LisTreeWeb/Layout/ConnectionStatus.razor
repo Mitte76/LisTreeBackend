@@ -1,0 +1,44 @@
+@implements IAsyncDisposable
+@inject IJSRuntime JS
+
+<div class="connection-status @(_isOnline ? "online" : "offline")" role="status" aria-live="polite">
+    <span class="connection-status-indicator" aria-hidden="true"></span>
+    <span>@(_isOnline ? "Online" : "Offline")</span>
+</div>
+
+@code {
+    private bool _isOnline = true;
+    private int? _subscriptionId;
+    private DotNetObjectReference<ConnectionStatus>? _dotNetReference;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        _dotNetReference = DotNetObjectReference.Create(this);
+        _subscriptionId = await JS.InvokeAsync<int>("lisTreeConnection.subscribe", _dotNetReference);
+    }
+
+    [JSInvokable]
+    public Task UpdateConnectionStatus(bool isOnline)
+    {
+        return InvokeAsync(() =>
+        {
+            _isOnline = isOnline;
+            StateHasChanged();
+        });
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (_subscriptionId is int subscriptionId)
+        {
+            await JS.InvokeVoidAsync("lisTreeConnection.unsubscribe", subscriptionId);
+        }
+
+        _dotNetReference?.Dispose();
+    }
+}

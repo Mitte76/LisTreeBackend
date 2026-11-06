@@ -1,6 +1,6 @@
 # LisTreeBackend
 
-ASP.NET Core Web API med .NET 10 och PostgreSQL. Lösningen består av API:t samt projekten `Application`, `Domain` och `Infrastructure`.
+Lösningen innehåller ett ASP.NET Core Web API med .NET 10 och PostgreSQL, projekten `Application`, `Domain` och `Infrastructure`, samt den fristående Blazor WebAssembly-appen `LisTreeWeb` med PWA-stöd.
 
 ## Förutsättningar på en ny Windows-dator
 
@@ -82,3 +82,7 @@ dotnet dev-certs https --trust
 ```
 
 API:ts användarändpunkter finns under `/api/Users`.
+
+## Starta Blazor-appen
+
+Starta `LisTreeWeb` med HTTPS-profilen i Visual Studio. Första gången behöver appen laddas klart online. När service workern har aktiverats, ladda om sidan en gång medan den fortfarande körs; de Blazor-resurser som laddas sparas då i webbläsarens cache. Därefter kan du stoppa appen i Visual Studio och öppna eller ladda om samma adress offline i samma webbläsare. Statusindikatorn kontrollerar om webbservern för `LisTreeWeb` kan nås och uppdateras ungefär var femte sekund; den visar inte om API:t eller internet i övrigt är tillgängligt.

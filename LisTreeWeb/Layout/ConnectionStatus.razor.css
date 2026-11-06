@@ -1,0 +1,22 @@
+.connection-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+}
+
+.connection-status.online {
+    color: #146c43;
+}
+
+.connection-status.offline {
+    color: #b02a37;
+}
+
+.connection-status-indicator {
+    width: 0.55rem;
+    height: 0.55rem;
+    border-radius: 50%;
+    background-color: currentColor;
+}
